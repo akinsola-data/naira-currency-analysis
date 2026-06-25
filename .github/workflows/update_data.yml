@@ -37,7 +37,7 @@ jobs:
       - name: Run Analytical & Visual Generation Scripts
         run: |
           cd notebooks
-          python 01_eda.py
+          python 01_EDA.py
           python 02_correlation_analysis.py
           python 03_time_series.py
           python 04_predictive_model.py
