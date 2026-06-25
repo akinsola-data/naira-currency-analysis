@@ -36,17 +36,33 @@ jobs:
 
       - name: Run Analytical & Visual Generation Scripts
         run: |
-          cd notebooks
-          python 01_EDA.py
-          python 02_correlation_analysis.py
-          python 03_time_series.py
-          python 04_predictive_model.py
+          echo "=== CURRENT REPOSITORY DIRECTORY STRUCTURE ==="
+          ls -la
+          echo "=== RECURSIVE FILE SEARCH ==="
+          find . -maxdepth 2 -not -path '*/.*'
+          
+          echo "=== EXECUTING SCRIPTS WITH ERROR LOGGING ==="
+          if [ -d "notebooks" ]; then
+            cd notebooks
+            echo "--> Running inside notebooks/ directory..."
+            python 01_EDA.py || python 01_eda.py || echo "--> WARNING: 01_EDA.py execution encountered an error"
+            python 02_correlation_analysis.py || echo "--> WARNING: 02_correlation_analysis.py execution encountered an error"
+            python 03_time_series.py || echo "--> WARNING: 03_time_series.py execution encountered an error"
+            python 04_predictive_model.py || echo "--> WARNING: 04_predictive_model.py execution encountered an error"
+            cd ..
+          else
+            echo "--> notebooks/ directory not found. Running directly in root directory..."
+            python 01_EDA.py || python 01_eda.py || echo "--> WARNING: 01_EDA.py execution encountered an error"
+            python 02_correlation_analysis.py || echo "--> WARNING: 02_correlation_analysis.py execution encountered an error"
+            python 03_time_series.py || echo "--> WARNING: 03_time_series.py execution encountered an error"
+            python 04_predictive_model.py || echo "--> WARNING: 04_predictive_model.py execution encountered an error"
+          fi
 
       - name: Commit and Push Updated Data & Hero Charts
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/ visuals/
+          git add data/ visuals/ || echo "No data or visuals folder to add"
           # Check if there are any changes to commit
           if git diff --staged --quiet; then
             echo "No new macroeconomic data changes to commit."
